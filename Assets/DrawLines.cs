@@ -136,12 +136,12 @@ public class DrawLines : MonoBehaviour {
         for (int i = 0; i < points.Count - 1; i++)
         {
             verticles[3 * i] = centerpoint;
-            verticles[3 * i + 1] = points[i];
-            verticles[3 * i + 2] = points[i + 1];
+            verticles[3 * i + 1] = points1[i];
+            verticles[3 * i + 2] = points1[i + 1];
         }
-        verticles[3 * (points.Count - 1)] = centerpoint;
-        verticles[3 * (points.Count - 1) + 1] = points[points.Count - 1];
-        verticles[3 * (points.Count - 1) + 2] = points[0];
+        verticles[3 * (points1.Count - 1)] = centerpoint;
+        verticles[3 * (points1.Count - 1) + 1] = points1[points1.Count - 1];
+        verticles[3 * (points1.Count - 1) + 2] = points1[0];
         Vector3[] verticles1=points1.ToArray();
         Vector3[] verticles2 = points.ToArray();
         Vector3[] verticles3 = new Vector3[verticles1.Length+verticles2.Length];
@@ -173,44 +173,52 @@ public class DrawLines : MonoBehaviour {
         int[] triangles1 = new int[points.Count * 2*3];
         for (int i = 0; i < (points.Count*2- 4)/2+1; i++)
         {
-            triangles1[i] = 2 * i;
-            triangles1[i + 1] = 2 * i + 1;
-            triangles1[i + 2] = 2 * i + 2;
+            triangles1[6*i] = 2 * i;
+            triangles1[6 * i + 1] = 2 * i + 1;
+            triangles1[6 * i + 2] = 2 * i + 2;
 
-            triangles1[i+3] = 2 *( i+1);
-            triangles1[i + 4] = 2 * (i + 1) -1;
-            triangles1[i + 5] = 2 * (i + 1) +1;
+            triangles1[6 * i +3] = 2 *( i+1);
+            triangles1[6 * i + 4] = 2 * (i + 1) -1;
+            triangles1[6 * i + 5] = 2 * (i + 1) +1;
+            
         }
-        int length = triangles1.Length;
-        triangles1[length - 1] = 1;
-        triangles1[length - 2] = length - 1;
-        triangles1[length - 3] = 0;
-        triangles1[length - 4] = 0;
-        triangles1[length - 5] = length - 1;
-        triangles1[length - 6] = length-2;
+        int length = points.Count * 2;
+        triangles1[triangles1.Length - 1] = 1;
+        triangles1[triangles1.Length - 2] = length - 1;
+        triangles1[triangles1.Length - 3] = 0;
+        triangles1[triangles1.Length - 4] = 0;
+        triangles1[triangles1.Length - 5] = length - 1;
+        triangles1[triangles1.Length - 6] = length-2;
+        for (int i = 0; i < triangles1.Length; i++)
+        {
+            Debug.Log(string.Format("{0},{1}",i, triangles1[i]));
+        }
         int[] triangles2 = new int[triangles.Length+ triangles1.Length];
         for (int i = 0; i < triangles2.Length; i++)
         {
             if (i<triangles.Length)
             {
                 triangles2[i] = triangles[i];
+
             }
             else
             {
-                triangles2[i] = triangles1[i-triangles.Length]+ triangles.Length;
+                triangles2[i] = triangles1[i-triangles.Length]+ verticles.Length;
+                
             }
-            
+            //Debug.Log(triangles2[i]);
         }
-        Debug.Log(verticles.Length);
-        Debug.Log(verticles3.Length);
-        Debug.Log(verticles4.Length);
-        Debug.Log(triangles.Length);
-        Debug.Log(triangles1.Length);
-        Debug.Log(triangles2.Length);
-        //mf.mesh.vertices = verticles4;
-        //mf.mesh.triangles = triangles2;
-        mf.mesh.vertices = verticles;
-        mf.mesh.triangles = triangles;
+        //Debug.Log(verticles.Length);
+        //Debug.Log(verticles3.Length);
+        //Debug.Log(verticles4.Length);
+        //Debug.Log(triangles.Length);
+        //Debug.Log(triangles1.Length);
+        //Debug.Log(triangles2.Length);
+
+        mf.mesh.vertices = verticles4;
+        mf.mesh.triangles = triangles2;
+        //mf.mesh.vertices = verticles;
+        //mf.mesh.triangles = triangles;
         mf.mesh.RecalculateNormals();
         mr.material = materialMesh;
 
