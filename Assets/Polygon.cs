@@ -54,7 +54,7 @@ public class Polygon : MeshDrawBase
 
         mesh.RecalculateBounds();
         mesh.RecalculateTangents();
-
+        GetComponent<MeshCollider>().sharedMesh = mesh;
         targetFilter.mesh = mesh;
     }
 

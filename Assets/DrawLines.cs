@@ -61,7 +61,7 @@ public class DrawLines : MonoBehaviour {
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray,out raycast))
             {
-                if (raycast.collider.gameObject==drawBoard)
+                if (/*raycast.collider.gameObject == drawBoard*/raycast.collider.gameObject.name == "model")
                 {
                     if (isDrawLine)
                     {
@@ -137,6 +137,7 @@ public class DrawLines : MonoBehaviour {
         Models.Add(obj);
         noweditorModel = obj;
         obj.name = "model";
+        //obj.AddComponent<MeshCollider>();
         MeshFilter mf = obj.AddComponent<MeshFilter>();
         MeshRenderer mr = obj.AddComponent<MeshRenderer>();
         Vector3 centerpoint = VectersAverage(points1);
@@ -232,7 +233,11 @@ public class DrawLines : MonoBehaviour {
         //mf.mesh.RecalculateBounds();
         //mf.mesh.RecalculateTangents();
         mr.material = materialMesh;
-       
+        obj.AddComponent<MeshCollider>().sharedMesh = mf.mesh;
+        if (Vector3.Dot(dir, mf.mesh.normals[0]) <  0)
+        {
+            Fanzhuanfaxian();
+        }
         //StartDraw();
     }
     Vector3 VectersAverage(List<Vector3> vecs)
@@ -256,6 +261,7 @@ public class DrawLines : MonoBehaviour {
         }
         mf.mesh.triangles = triangles;
         mf.mesh.RecalculateNormals();
+        mf.GetComponent<MeshCollider>().sharedMesh = mf.mesh;
     }
     private void OnGUI()
     {
@@ -271,6 +277,7 @@ public class DrawLines : MonoBehaviour {
             var uiPos = new Vector3(screenPos.x, Camera.main.pixelHeight - screenPos.y, screenPos.z);
 
             GUI.Label(new Rect(uiPos, new Vector2(100, 80)), i.ToString());
+            //Debug.Log(points.Count);
         }
     }
 
