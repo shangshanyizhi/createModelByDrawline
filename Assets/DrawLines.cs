@@ -257,4 +257,33 @@ public class DrawLines : MonoBehaviour {
         mf.mesh.triangles = triangles;
         mf.mesh.RecalculateNormals();
     }
+    private void OnGUI()
+    {
+        if (points.Count == 0) return;
+
+        GUI.color = Color.red;
+
+        for (int i = 0; i < points.Count; ++i)
+        {
+            //var worldPos = drawBoard.transform.TransformPoint(points[i]);
+            //var screenPos = Camera.main.WorldToScreenPoint(worldPos);
+            var screenPos = Camera.main.WorldToScreenPoint(points[i]);
+            var uiPos = new Vector3(screenPos.x, Camera.main.pixelHeight - screenPos.y, screenPos.z);
+
+            GUI.Label(new Rect(uiPos, new Vector2(100, 80)), i.ToString());
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (points.Count == 0) return;
+
+        Gizmos.color = Color.cyan;
+        foreach (var pos in points)
+        {
+            //var worldPos = drawBoard.transform.TransformPoint(pos);
+            //Gizmos.DrawWireSphere(worldPos, .2f);
+            Gizmos.DrawWireSphere(pos, .2f);
+        }
+    }
 }
