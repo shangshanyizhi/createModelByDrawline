@@ -1,3 +1,3 @@
 # createModelByDrawline
-通过绘制线生成地形
-1、目前版本为v1.0.0，可以通过绘制凸多边形并生成模型；绘制凹多边形存在问题存在遮挡问题；
+使用unity开发，通过绘制线生成地形
+![效果图](https://github.com/shangshanyizhi/createModelByDrawline/blob/master/1%20(2).png)
