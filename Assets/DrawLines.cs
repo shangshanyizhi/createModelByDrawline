@@ -11,9 +11,11 @@ public class DrawLines : MonoBehaviour {
     List<LineRenderer> lineRenders = new List<LineRenderer>();
     LineRenderer nowEditorLineRender;
     List<Vector3> points = new List<Vector3>();
+    List<int> indexes = new List<int>();
     bool isDrawLine = false;
     bool isadjustViewer=true;
     float moudle =0;
+    int index = 0;
     Vector3 dir=Vector3.zero;
 	// Use this for initialization
 	void Start () {
@@ -63,7 +65,10 @@ public class DrawLines : MonoBehaviour {
                 {
                     if (isDrawLine)
                     {
+                        //var localHitPos = drawBoard.transform.InverseTransformPoint(raycast.point);
+                        //points.Add(localHitPos);
                         points.Add(raycast.point);
+                        indexes.Add(index++);
                         nowEditorLineRender.positionCount =points.Count;
                         nowEditorLineRender.SetPositions(points.ToArray());
                     }
@@ -86,6 +91,8 @@ public class DrawLines : MonoBehaviour {
 
         isadjustViewer = false;
         points.Clear();
+        indexes.Clear();
+        index = 0;
         if (nowEditorLineRender != null)
         {
             nowEditorLineRender.loop = false;
@@ -109,22 +116,23 @@ public class DrawLines : MonoBehaviour {
     public void CreateModel()
     {
         List<Vector3> points1 = new List<Vector3>();
+        //points1 = points;
         dir = -drawBoard.transform.position + Camera.main.transform.position;
-        if (Vector3.Dot(dir, drawBoard.transform.right)<0)
+        if (Vector3.Dot(dir, -drawBoard.transform.forward) < 0)
         {
             for (int i = 0; i < points.Count; i++)
             {
-                points1.Add(points[i] - drawBoard.transform.right);
+                points1.Add(points[i] + drawBoard.transform.forward * 1f);
             }
         }
         else
         {
             for (int i = 0; i < points.Count; i++)
             {
-                points1.Add(points[i] + drawBoard.transform.right);
+                points1.Add(points[i] - drawBoard.transform.forward * 1f);
             }
         }
-        
+
         GameObject obj = new GameObject();
         Models.Add(obj);
         noweditorModel = obj;
@@ -132,16 +140,17 @@ public class DrawLines : MonoBehaviour {
         MeshFilter mf = obj.AddComponent<MeshFilter>();
         MeshRenderer mr = obj.AddComponent<MeshRenderer>();
         Vector3 centerpoint = VectersAverage(points1);
-        Vector3[] verticles = new Vector3[points1.Count*3];
-        for (int i = 0; i < points.Count - 1; i++)
-        {
-            verticles[3 * i] = centerpoint;
-            verticles[3 * i + 1] = points1[i];
-            verticles[3 * i + 2] = points1[i + 1];
-        }
-        verticles[3 * (points1.Count - 1)] = centerpoint;
-        verticles[3 * (points1.Count - 1) + 1] = points1[points1.Count - 1];
-        verticles[3 * (points1.Count - 1) + 2] = points1[0];
+        Vector3[] verticles =points1.ToArray();
+        //Vector3[] verticles = new Vector3[points1.Count*3];
+        //for (int i = 0; i < points.Count - 1; i++)
+        //{
+        //    verticles[3 * i] = centerpoint;
+        //    verticles[3 * i + 1] = points1[i];
+        //    verticles[3 * i + 2] = points1[i + 1];
+        //}
+        //verticles[3 * (points1.Count - 1)] = centerpoint;
+        //verticles[3 * (points1.Count - 1) + 1] = points1[points1.Count - 1];
+        //verticles[3 * (points1.Count - 1) + 2] = points1[0];
         Vector3[] verticles1=points1.ToArray();
         Vector3[] verticles2 = points.ToArray();
         Vector3[] verticles3 = new Vector3[verticles1.Length+verticles2.Length];
@@ -151,7 +160,6 @@ public class DrawLines : MonoBehaviour {
             verticles3[2 * i+1] = verticles2[i];
         }
 
-        //verticles.CopyTo(verticles3, 0);
         Vector3[] verticles4 = new Vector3[verticles.Length+verticles3.Length];
         for (int i = 0; i < verticles4.Length; i++)
         {
@@ -165,11 +173,12 @@ public class DrawLines : MonoBehaviour {
             }
             
         }
-        int[] triangles = new int[points.Count * 3];
-        for (int i = 0; i < triangles.Length; i++)
-        {
-            triangles[i] = i;
-        }
+        int[] triangles = Triangulation.WidelyTriangleIndex(points1,indexes).ToArray();
+        //int[] triangles = new int[points.Count * 3];
+        //for (int i = 0; i < triangles.Length; i++)
+        //{
+        //    triangles[i] = i;
+        //}
         int[] triangles1 = new int[points.Count * 2*3];
         for (int i = 0; i < (points.Count*2- 4)/2+1; i++)
         {
@@ -220,9 +229,11 @@ public class DrawLines : MonoBehaviour {
         //mf.mesh.vertices = verticles;
         //mf.mesh.triangles = triangles;
         mf.mesh.RecalculateNormals();
+        //mf.mesh.RecalculateBounds();
+        //mf.mesh.RecalculateTangents();
         mr.material = materialMesh;
-
-        StartDraw();
+       
+        //StartDraw();
     }
     Vector3 VectersAverage(List<Vector3> vecs)
     {
